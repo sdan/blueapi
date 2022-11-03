@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn migrate:deploy && next build",
+    "build": "next build",
     "start": "next start --port ${PORT-3000}",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
