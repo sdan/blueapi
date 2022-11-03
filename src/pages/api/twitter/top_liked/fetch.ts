@@ -1,3 +1,4 @@
+// @ts-ignore  
 import { PrismaClient } from '@prisma/client';
 import { Client } from 'twitter-api-sdk';
 import { components } from '../../../../utils/twitter';
