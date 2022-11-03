@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Client } from 'twitter-api-sdk';
-import { components } from 'twitter-api-sdk/dist/types';
+import { components } from '../../../../utils/twitter';
 type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 
