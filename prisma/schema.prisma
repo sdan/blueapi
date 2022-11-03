@@ -1,18 +1,91 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator client {
+  provider      = "prisma-client-js"
+  output = "../node_modules/.prisma/client"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Account {
+  providerAccountId String  @id
+  userId            String
+  type              String?
+  provider          String?
+
+  refresh_token String? @db.Text
+  access_token  String? @db.Text
+  expires_at    Int?
+  token_type    String?
+  scope         String?
+  id_token      String? @db.Text
+  session_state String?
+
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  TimelineTweets TimelineTweets[]
+  LikedTweets LikedTweets[] 
+
+  @@unique([provider, providerAccountId])
 }
 
-model Todo {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  text      String
-  completed Boolean
+model Session {
+  providerAccountId String   @id
+  sessionToken      String   @unique
+  userId            String
+  expires           DateTime
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String?
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model TimelineTweets {
+  id        String   @id @default(cuid())
+  author    String
+  text      String
+  likes     Int      @default(0)
+  retweets  Int      @default(0)
+  entities  Json?
+  createdAt DateTime
+  userId    String
+
+  user Account @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
+  // Use Tweet model to store list of the users liked tweets
+  @@unique([id])
+}
+
+model LikedTweets {
+  id        String   @id @default(cuid())
+  author    String
+  username String
+  text      String
+  likes     Int      @default(0)
+  retweets  Int      @default(0)
+  entities  Json?
+  createdAt DateTime
+  userId    String
+  // Use Tweet model to store list of the users liked tweets
+  user Account @relation(fields: [userId], references: [providerAccountId], onDelete: Cascade)
+  @@unique([id])
+}
+
