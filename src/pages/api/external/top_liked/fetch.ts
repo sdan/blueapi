@@ -1,15 +1,48 @@
 // @ts-ignore  
+import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { Client } from 'twitter-api-sdk';
 import { components } from '../../../../utils/twitter';
 type Tweet = components['schemas']['Tweet'];
 const prisma = new PrismaClient();
 
+import Cors from 'cors'
+
+// Initializing the cors middleware
+// You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
+const cors = Cors({
+  methods: ['POST', 'GET', 'HEAD'],
+})
+
+// Helper method to wait for a middleware to execute before continuing
+// And to throw an error when an error happens in a middleware
+function runMiddleware(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  fn: Function
+) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: any) => {
+      if (result instanceof Error) {
+        return reject(result)
+      }
+
+      return resolve(result)
+    })
+  })
+}
+
 export default async function handle(req: any, res: any) {
+
+    // Run the middleware
+    await runMiddleware(req, res, cors)
+
   console.log('in api fetch');
   console.log('req.body', req.body);
+  
   const { accessToken, twtrId } = req.body;
 
+  
   try {
     if (!accessToken && !twtrId) {
       throw new Error('No access token or twitter id');
