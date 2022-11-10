@@ -65,7 +65,7 @@ export async function StoreUser(
   userData: User,
   twtrId: any
 ) {
-  console.log("tweets in store list tweets");
+  console.log("tweets in store following users");
 
   const twt = await pc.account.update({
     where: {
@@ -80,13 +80,13 @@ export async function StoreUser(
           create: {
             id: userData.id!,
             username: userData.username!,
-            name: userData.name!,
-            bio: userData.description!,
-            location: userData.location!,
-            url: userData.url!,
+            name: userData.name,
+            bio: userData.description,
+            location: userData.location,
+            url: userData.url,
             followers: userData?.public_metrics?.followers_count!,
             following: userData?.public_metrics?.following_count!,
-            likes: userData?.public_metrics?.tweet_count!
+            tweets: userData?.public_metrics?.tweet_count
 
           },
         },
