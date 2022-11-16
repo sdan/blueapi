@@ -5,8 +5,9 @@ import { Client } from "twitter-api-sdk";
 import { components } from "../../../../utils/twitter";
 type User = components["schemas"]["User"];
 const prisma = new PrismaClient();
-
+import { setTimeout } from "timers/promises";
 import Cors from "cors";
+import { time } from "console";
 
 // Initializing the cors middleware
 // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -117,6 +118,11 @@ export async function FetchLatestTweet(
   const data = await tClient.tweets.usersIdTweets(twtrId, {
     max_results: 5,
   });
+
+  if(data.errors){
+    console.log("[ERROR FETCH TWEET]", data.errors);
+      }
+
   return data.meta?.newest_id;
 }
 
@@ -127,6 +133,10 @@ export async function FetchLatestLike(
   const data = await tClient.tweets.usersIdLikedTweets(twtrId, {
     max_results: 5,
     });
+
+    if(data.errors){
+  console.log("[ERROR FETCH LIKES]", data.errors);
+    }
 
   return data.data![0].id;
 }
@@ -186,15 +196,25 @@ export async function FetchFollowing(tClient: Client, twtrId: string) {
 }
 
 export async function FetchFollowingLatestActivity(tClient: Client, twtrId: string){
+  let rateLimitCounter = 73;
   const following = await FetchFollowing(tClient, twtrId);
   const followingActivity: any = [];
   for (const user of following) {
+    if(rateLimitCounter > 0){
     const activity = await FetchLatestActivity(tClient, user.id);
     followingActivity.push({
       user: user,
       activity: activity,
     });
     StoreUserActivity(prisma, user,activity, twtrId);
+    rateLimitCounter--;
+  } else {
+    rateLimitCounter = 73;
+    console.log("[SLEEPING FOR 15 MINUTES, RATE LIMIT REACHED]");
+    // Sleep for 15 minutes
+    await setTimeout(900000);
+
   }
   return followingActivity;
+}
 }
