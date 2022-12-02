@@ -343,7 +343,7 @@ export async function FetchFollowingLatestActivity(
         activity = await FetchLatestActivity(tClient, user.id);
         const returnedUsrData = await StoreUserActivity(prisma, user,activity, twtrId);
         console.log("returnedUsrData", returnedUsrData);
-        } catch (error) {   
+        } catch (error:any) {   
             console.log("error", error);
             if (error?.status === 429) {
                 console.log("rate limit exceeded");
