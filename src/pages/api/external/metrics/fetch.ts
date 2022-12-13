@@ -62,63 +62,59 @@ export default async function handle(req: any, res: any) {
 }
 
 export async function StoreMetrics(
-    pc: PrismaClient,
-    userData: User,
-    twtrId: any
-  ) {
-    console.log("tweets in store metrics ");
-    // Get current time in Date format
-    const now = new Date();
-  
-    const twt = await pc.metrics.upsert({
-        where: {
-            userId: userData.id,
-        },
-        update: {
-            name: userData.name,
-            bio: userData.description,
-            location: userData.location,
-            url: userData.url,
-            followers: userData?.public_metrics?.followers_count!,
-            following: userData?.public_metrics?.following_count!,
-            latestFollowers: {
-                push: userData?.public_metrics?.followers_count!,
-            },
-            latestFollowing: {
-                push: userData?.public_metrics?.following_count!,
-            },
-            fetchedFollowers: {
-                push: now,
-            },
-            fetchedFollowing: {
-                push: now,
-            },
-        },
-        create: {
-            userId: userData.id,
-            username: userData.username,
-            name: userData.name,
-            bio: userData.description,
-            location: userData.location,
-            url: userData.url,
-            followers: userData?.public_metrics?.followers_count!,
-            following: userData?.public_metrics?.following_count!,
-            latestFollowers: [userData?.public_metrics?.followers_count!],
-            latestFollowing: [userData?.public_metrics?.following_count!],
-            fetchedFollowers: [now],
-            fetchedFollowing: [now],
-        },
-    });
-  
-    console.log("metrics insert updated", userData.username);
-    return twt;
-  }
-
-export async function StoreUser(
   pc: PrismaClient,
   userData: User,
   twtrId: any
 ) {
+  console.log("tweets in store metrics ");
+  // Get current time in Date format
+  const now = new Date();
+
+  const twt = await pc.metrics.upsert({
+    where: {
+      userId: userData.id,
+    },
+    update: {
+      name: userData.name,
+      bio: userData.description,
+      location: userData.location,
+      url: userData.url,
+      followers: userData?.public_metrics?.followers_count!,
+      following: userData?.public_metrics?.following_count!,
+      latestFollowers: {
+        push: userData?.public_metrics?.followers_count!,
+      },
+      latestFollowing: {
+        push: userData?.public_metrics?.following_count!,
+      },
+      fetchedFollowers: {
+        push: now,
+      },
+      fetchedFollowing: {
+        push: now,
+      },
+    },
+    create: {
+      userId: userData.id,
+      username: userData.username,
+      name: userData.name,
+      bio: userData.description,
+      location: userData.location,
+      url: userData.url,
+      followers: userData?.public_metrics?.followers_count!,
+      following: userData?.public_metrics?.following_count!,
+      latestFollowers: [userData?.public_metrics?.followers_count!],
+      latestFollowing: [userData?.public_metrics?.following_count!],
+      fetchedFollowers: [now],
+      fetchedFollowing: [now],
+    },
+  });
+
+  console.log("metrics insert updated", userData.username);
+  return twt;
+}
+
+export async function StoreUser(pc: PrismaClient, userData: User, twtrId: any) {
   console.log("tweets in store following users");
 
   const twt = await pc.account.update({
@@ -140,8 +136,7 @@ export async function StoreUser(
             url: userData.url,
             followers: userData?.public_metrics?.followers_count!,
             following: userData?.public_metrics?.following_count!,
-            tweets: userData?.public_metrics?.tweet_count
-
+            tweets: userData?.public_metrics?.tweet_count,
           },
         },
       },
@@ -158,6 +153,8 @@ export async function FetchMetrics(tClient: Client, twtrId: string) {
   let insertedMetrics: any;
 
   console.log("in fetch following", twtrId);
+
+  FetchSelfMetrics(tClient, twtrId);
 
   const getFollowing = tClient.users.usersIdFollowing(twtrId, {
     max_results: 100,
@@ -182,11 +179,48 @@ export async function FetchMetrics(tClient: Client, twtrId: string) {
       console.log("followers:", user.public_metrics?.followers_count);
       insertedUser = await StoreUser(prisma, user, twtrId);
       insertedMetrics = await StoreMetrics(prisma, user, twtrId);
-
     }
     numTweets += page?.meta?.result_count || 0;
   }
 
   console.log("cumtweets:", numTweets);
   return numTweets;
+}
+
+// Fetch metrics for current user
+async function FetchSelfMetrics(tClient: Client, twtrId: string) {
+  let numTweets = 0;
+  let insertedUser: any;
+  let insertedMetrics: any;
+
+  console.log("in fetch self metrics", twtrId);
+
+  const getFollowing = await tClient.users.findMyUser({
+    "user.fields": [
+      "id",
+      "name",
+      "username",
+      "created_at",
+      "description",
+      "location",
+      "profile_image_url",
+      "public_metrics",
+      "verified",
+      "url",
+      "entities",
+    ],
+  });
+
+  const myUser = getFollowing?.data;
+  if (myUser) {
+    console.log("user id: ", getFollowing.data?.id);
+    console.log(
+      "followers:",
+      getFollowing.data?.public_metrics?.followers_count
+    );
+    insertedUser = await StoreUser(prisma, myUser, twtrId);
+    insertedMetrics = await StoreMetrics(prisma, myUser, twtrId);
+  }
+
+  return;
 }
