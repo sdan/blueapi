@@ -96,6 +96,7 @@ model Following {
   bio         String?
   location    String?
   url         String?
+  pfp              String?
   followers   Int       @default(0)
   following   Int       @default(0)
   tweets      Int?      @default(0)
@@ -113,6 +114,7 @@ model Metrics {
   bio              String?
   location         String?
   url              String?
+  pfp              String?
   followers        Int        @default(0)
   following        Int        @default(0)
   tweets           Int       @default(0)
