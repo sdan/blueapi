@@ -115,8 +115,9 @@ model Metrics {
   url              String?
   followers        Int        @default(0)
   following        Int        @default(0)
-  tweets           Int[]
-  latestTweets     DateTime[]
+  tweets           Int       @default(0)
+  latestTweets           Int[]
+  fetchedTweets     DateTime[]
   latestFollowers  Int[]
   latestFollowing  Int[]
   fetchedFollowers DateTime[]

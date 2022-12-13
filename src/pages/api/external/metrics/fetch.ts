@@ -83,6 +83,9 @@ export async function StoreMetrics(
       following: userData?.public_metrics?.following_count!,
       tweets: userData?.public_metrics?.tweet_count!,
       latestTweets: {
+        push: userData?.public_metrics?.tweet_count!,
+      },
+      fetchedTweets: {
         push: now,
       },
       latestFollowers: {
