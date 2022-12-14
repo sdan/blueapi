@@ -68,35 +68,6 @@ export async function StoreUserActivity(
 ) {
   console.log("tweets in store updating user activity");
   console.log("activity", activity);
-
-//   const twt = await pc.account.update({
-//     where: {
-//       providerAccountId: twtrId,
-//     },
-//     data: {
-//       Following: {
-//         connectOrCreate: {
-//             where: {
-//                 id: userData.id,
-//             },
-
-//           create: {
-//             id: userData.id!,
-//             username: userData.username!,
-//             name: userData.name,
-//             bio: userData.description,
-//             location: userData.location,
-//             url: userData.url,
-//             followers: userData?.public_metrics?.followers_count!,
-//             following: userData?.public_metrics?.following_count!,
-//             tweets: userData?.public_metrics?.tweet_count,
-//             latestLikes: activity.lastLike.time,
-//             latestTweet: activity.lastTweet.time,
-//           },
-//         },
-//       },
-//     },
-//   });
 console.log('userData.id', userData.id)
 
 const updt = await pc.following.update({
@@ -194,6 +165,8 @@ export async function StoreUser(pc: PrismaClient, userData: User, twtrId: any) {
             followers: userData?.public_metrics?.followers_count!,
             following: userData?.public_metrics?.following_count!,
             tweets: userData?.public_metrics?.tweet_count,
+            pfp: userData.profile_image_url,
+
           },
         },
       },
