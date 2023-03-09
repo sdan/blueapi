@@ -1,39 +1,5 @@
----
-title: NextJS Prisma
-description: A NextJS app using Prisma with a PostgreSQL database
-tags:
-  - next
-  - prisma
-  - postgresql
-  - typescript
----
+# bluesearch api
 
-# NextJS Prisma Example
+this api powers bluesearch.xyz
 
-This example is a [NextJS](https://nextjs.org/) todo app that uses
-[Prisma](https://www.prisma.io/) to store todos in Postgres.
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/HRZqTF)
-
-## ✨ Features
-
-- Prisma
-- NextJS
-- Postgres
-- TypeScript
-
-## 💁‍♀️ How to use
-
-- [Provision a Postgres container on Railway](https://dev.new)
-- Connect to your Railway project with `railway link`
-- Migrate the database `railway run yarn migrate:dev`
-- Run the NextJS app `railway run yarn dev`
-
-## 📝 Notes
-
-This app is a simple todo list where the data is persisted to Postgres. [Prisma
-migrations](https://www.prisma.io/docs/concepts/components/prisma-migrate#prisma-migrate)
-can be created with `railway run yarn migrate:dev` and deployed with `railway run yarn migrate:deploy`. The Prisma client can be regenerated with
-`yarn generate`.
-
-[swr](https://swr.vercel.app/) is used to fetch data on the client and perform optimistic updates.
+long running operations (pulling all your follower/following stats) takes much longer than the alloted 60 seconds vercel serverless functions give you, this backend runs on a dedicated box that fetches data and stores it into a big "data lake" which can be used to fetch [public metrics](https://bluesearch.xyz/metrics) and timeline summarization
